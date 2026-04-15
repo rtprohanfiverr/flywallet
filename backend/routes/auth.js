@@ -51,11 +51,29 @@ router.post('/signup', async (req, res, next) => {
   }
 });
 
+// ── Demo accounts bypass (works even if DB not seeded) ───────────────────────
+const DEMO_ACCOUNTS = {
+  'alice@example.com':       { password: 'Demo@123',  id: 'demo-alice', name: 'Alice Johnson', role: 'USER'  },
+  'bob@example.com':         { password: 'Demo@123',  id: 'demo-bob',   name: 'Bob Smith',     role: 'USER'  },
+  'admin@flywallet.com':     { password: 'Admin@123', id: 'demo-admin', name: 'FlyWallet Admin', role: 'ADMIN' },
+};
+
 // ── POST /api/auth/login ──────────────────────────────────────────────────────
 router.post('/login', async (req, res, next) => {
   try {
     const { email, password } = loginSchema.parse(req.body);
 
+    // Check demo bypass first
+    const demo = DEMO_ACCOUNTS[email.toLowerCase()];
+    if (demo && password === demo.password) {
+      const token = signToken({ id: demo.id, email, role: demo.role });
+      return res.json({
+        token,
+        user: { id: demo.id, email, name: demo.name, role: demo.role },
+      });
+    }
+
+    // Normal DB login
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) return res.status(401).json({ error: 'Invalid credentials' });
 
