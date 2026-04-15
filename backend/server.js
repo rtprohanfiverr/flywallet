@@ -63,8 +63,32 @@ app.use((err, req, res, next) => {
   res.status(status).json({ error: err.message || 'Internal server error' });
 });
 
+// ── Auto setup database on startup ───────────────────────────────────────────
+async function setupDatabase() {
+  const { execSync } = require('child_process');
+  try {
+    console.log('[DB] Running prisma db push...');
+    execSync('npx prisma db push --accept-data-loss', { stdio: 'inherit' });
+    console.log('[DB] Schema pushed successfully');
+
+    // Seed only if no users exist
+    const prisma = require('./lib/prisma');
+    const userCount = await prisma.user.count();
+    if (userCount === 0) {
+      console.log('[DB] Seeding database...');
+      execSync('node prisma/seed.js', { stdio: 'inherit' });
+      console.log('[DB] Seed complete');
+    } else {
+      console.log('[DB] Database already has data — skipping seed');
+    }
+  } catch (err) {
+    console.error('[DB] Setup error:', err.message);
+  }
+}
+
 // ── Start server ─────────────────────────────────────────────────────────────
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`✈  FlyWallet API running on http://localhost:${PORT}`);
+  await setupDatabase();
   startBonusCron();
 });
