@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — FlyWallet</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈</text></svg>" />
+</head>
+<body>
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <a href="index.html" class="navbar-brand" style="justify-content:center;">
+        <div class="logo-icon">✈</div>
+        FlyWallet
+      </a>
+      <p class="tagline">Sign in to your travel wallet</p>
+    </div>
+
+    <div id="alert-box"></div>
+
+    <form id="login-form">
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" id="email" class="form-control" placeholder="you@example.com" required autocomplete="email" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="relative">
+          <input type="password" id="password" class="form-control" placeholder="••••••••" required autocomplete="current-password" />
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-full btn-lg" id="submit-btn" style="margin-top:8px;">
+        <span id="btn-text">Sign In</span>
+        <span id="btn-spinner" class="spinner hidden"></span>
+      </button>
+    </form>
+
+    <div style="text-align:center; margin-top:20px;">
+      <p class="text-muted text-sm">
+        Don't have a wallet?
+        <a href="signup.html" style="color:var(--primary-light); font-weight:600;">Create one free →</a>
+      </p>
+    </div>
+
+    <div class="disclaimer-banner" style="margin-top:24px; margin-bottom:0;">
+      ⚠️ <span style="font-size:0.78rem;">FlyWallet is a travel wallet. Bonuses are variable and not guaranteed.</span>
+    </div>
+
+    <!-- Demo credentials hint -->
+    <div class="card card-sm" style="margin-top:16px; background:rgba(99,102,241,0.07);">
+      <p class="text-xs text-muted" style="margin-bottom:8px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Demo Credentials</p>
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <button class="btn btn-ghost btn-sm" onclick="fillDemo('alice@example.com','Demo@123')" style="justify-content:flex-start; font-size:0.78rem;">
+          👩 alice@example.com / Demo@123
+        </button>
+        <button class="btn btn-ghost btn-sm" onclick="fillDemo('admin@flywallet.com','Admin@123')" style="justify-content:flex-start; font-size:0.78rem;">
+          🔑 admin@flywallet.com / Admin@123
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  // Redirect if already logged in
+  if (localStorage.getItem('fw_token')) {
+    window.location.href = 'dashboard.html';
+  }
+
+  function fillDemo(email, pass) {
+    document.getElementById('email').value    = email;
+    document.getElementById('password').value = pass;
+  }
+
+  document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn     = document.getElementById('submit-btn');
+    const btnText = document.getElementById('btn-text');
+    const spinner = document.getElementById('btn-spinner');
+    const alertBox = document.getElementById('alert-box');
+
+    btn.disabled = true;
+    btnText.textContent = 'Signing in…';
+    spinner.classList.remove('hidden');
+    alertBox.innerHTML  = '';
+
+    try {
+      const data = await api.post('/auth/login', {
+        email:    document.getElementById('email').value.trim(),
+        password: document.getElementById('password').value,
+      });
+
+      localStorage.setItem('fw_token', data.token);
+      localStorage.setItem('fw_user',  JSON.stringify(data.user));
+
+      showToast('Welcome back, ' + data.user.name + '! ✈', 'success');
+
+      setTimeout(() => {
+        window.location.href = data.user.role === 'ADMIN' ? 'admin.html' : 'dashboard.html';
+      }, 800);
+    } catch (err) {
+      alertBox.innerHTML = `<div class="alert alert-error">⚠️ ${err.message}</div>`;
+      btn.disabled = false;
+      btnText.textContent = 'Sign In';
+      spinner.classList.add('hidden');
+    }
+  });
+</script>
+</body>
+</html>

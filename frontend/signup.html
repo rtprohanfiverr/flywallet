@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up — FlyWallet</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈</text></svg>" />
+</head>
+<body>
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <a href="index.html" class="navbar-brand" style="justify-content:center;">
+        <div class="logo-icon">✈</div>
+        FlyWallet
+      </a>
+      <p class="tagline">Create your free travel wallet</p>
+    </div>
+
+    <div id="alert-box"></div>
+
+    <form id="signup-form" novalidate>
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input type="text" id="name" class="form-control" placeholder="Jane Smith" required autocomplete="name" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" id="email" class="form-control" placeholder="you@example.com" required autocomplete="email" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" id="password" class="form-control" placeholder="Min 8 chars, 1 uppercase, 1 number" required autocomplete="new-password" />
+        <p class="form-text">Must be at least 8 characters with one uppercase letter and one number.</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirm Password</label>
+        <input type="password" id="confirm-password" class="form-control" placeholder="Re-enter password" required />
+      </div>
+
+      <div style="display:flex; align-items:flex-start; gap:10px; margin-bottom:20px;">
+        <input type="checkbox" id="terms" style="margin-top:3px; accent-color:var(--primary);" required />
+        <label for="terms" class="text-sm text-muted" style="cursor:pointer;">
+          I understand that FlyWallet is a travel wallet platform. Travel savings bonuses are variable and <strong>not guaranteed</strong>.
+        </label>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-full btn-lg" id="submit-btn">
+        <span id="btn-text">🚀 Create Wallet</span>
+        <span id="btn-spinner" class="spinner hidden"></span>
+      </button>
+    </form>
+
+    <div style="text-align:center; margin-top:20px;">
+      <p class="text-muted text-sm">
+        Already have a wallet?
+        <a href="login.html" style="color:var(--primary-light); font-weight:600;">Sign in →</a>
+      </p>
+    </div>
+
+    <!-- Benefits -->
+    <div style="margin-top:24px; display:flex; flex-direction:column; gap:8px;">
+      <div style="display:flex; align-items:center; gap:8px; font-size:0.82rem; color:var(--text-muted);">
+        <span style="color:var(--success);">✓</span> Free to create — no credit card required
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; font-size:0.82rem; color:var(--text-muted);">
+        <span style="color:var(--success);">✓</span> Withdraw your funds anytime
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; font-size:0.82rem; color:var(--text-muted);">
+        <span style="color:var(--success);">✓</span> Secure Stripe-powered deposits
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  if (localStorage.getItem('fw_token')) {
+    window.location.href = 'dashboard.html';
+  }
+
+  document.getElementById('signup-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn      = document.getElementById('submit-btn');
+    const btnText  = document.getElementById('btn-text');
+    const spinner  = document.getElementById('btn-spinner');
+    const alertBox = document.getElementById('alert-box');
+
+    const name     = document.getElementById('name').value.trim();
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const confirm  = document.getElementById('confirm-password').value;
+    const terms    = document.getElementById('terms').checked;
+
+    alertBox.innerHTML = '';
+
+    if (!terms) {
+      alertBox.innerHTML = `<div class="alert alert-warning">⚠️ Please accept the terms to continue.</div>`;
+      return;
+    }
+    if (password !== confirm) {
+      alertBox.innerHTML = `<div class="alert alert-error">⚠️ Passwords do not match.</div>`;
+      return;
+    }
+
+    btn.disabled = true;
+    btnText.textContent = 'Creating wallet…';
+    spinner.classList.remove('hidden');
+
+    try {
+      const data = await api.post('/auth/signup', { name, email, password });
+
+      localStorage.setItem('fw_token', data.token);
+      localStorage.setItem('fw_user',  JSON.stringify(data.user));
+
+      showToast('Wallet created! Welcome to FlyWallet ✈', 'success');
+      setTimeout(() => { window.location.href = 'dashboard.html'; }, 900);
+    } catch (err) {
+      alertBox.innerHTML = `<div class="alert alert-error">⚠️ ${err.message}</div>`;
+      btn.disabled = false;
+      btnText.textContent = '🚀 Create Wallet';
+      spinner.classList.add('hidden');
+    }
+  });
+</script>
+</body>
+</html>

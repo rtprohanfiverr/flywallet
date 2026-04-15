@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Withdraw — FlyWallet</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈</text></svg>" />
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="navbar-brand">
+    <div class="logo-icon">✈</div>
+    FlyWallet
+  </a>
+  <div class="navbar-nav">
+    <a href="dashboard.html" class="nav-link">← Dashboard</a>
+    <button onclick="logout()" class="btn btn-ghost btn-sm">Logout</button>
+  </div>
+</nav>
+
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-section">Main</div>
+    <nav class="sidebar-menu">
+      <a href="dashboard.html" class="sidebar-link"><span class="icon">📊</span> Dashboard</a>
+      <a href="add-funds.html" class="sidebar-link"><span class="icon">💳</span> Add Funds</a>
+      <a href="withdraw.html"  class="sidebar-link active"><span class="icon">💸</span> Withdraw</a>
+      <a href="flights.html"   class="sidebar-link"><span class="icon">✈️</span> Book Flights</a>
+    </nav>
+    <div class="sidebar-section" style="margin-top:16px;">Account</div>
+    <nav class="sidebar-menu">
+      <button onclick="logout()" class="sidebar-link" style="border:none;background:none;cursor:pointer;width:100%;text-align:left;color:var(--danger);">
+        <span class="icon">🚪</span> Logout
+      </button>
+    </nav>
+    <div style="margin-top:auto;padding-top:24px;">
+      <div style="background:rgba(99,102,241,0.1);border:1px solid var(--border);border-radius:12px;padding:14px;">
+        <div style="font-size:0.72rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Available to Withdraw</div>
+        <div id="sidebar-balance" style="font-size:1.4rem;font-weight:800;color:#fff;">—</div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="page-content">
+    <div class="disclaimer-banner">
+      ⚠️ <span>Withdrawals are subject to liquidity. Large withdrawals may be queued and processed within 24 hours.</span>
+    </div>
+
+    <div class="page-header">
+      <h2>💸 Withdraw Funds</h2>
+      <p>Transfer your wallet balance back to your bank account</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;">
+
+      <!-- Withdraw form -->
+      <div class="card">
+        <h3 style="margin-bottom:20px;">Withdrawal Amount</h3>
+        <div id="alert-box"></div>
+
+        <form id="withdraw-form">
+          <div class="form-group">
+            <label class="form-label">Amount (USD)</label>
+            <input type="number" id="amount" class="form-control" placeholder="0.00"
+                   min="10" step="0.01" required />
+            <div class="amount-presets">
+              <button type="button" class="preset-btn" onclick="setAmount(50)">$50</button>
+              <button type="button" class="preset-btn" onclick="setAmount(100)">$100</button>
+              <button type="button" class="preset-btn" onclick="setAmount(250)">$250</button>
+              <button type="button" class="preset-btn" onclick="setAmount(500)">$500</button>
+              <button type="button" class="preset-btn" onclick="setAmountMax()">Max</button>
+            </div>
+            <p class="form-text">Minimum withdrawal: $10</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Bank Account</label>
+            <input type="text" class="form-control" value="••••  ••••  ••••  4242" readonly
+                   style="color:var(--text-dim);cursor:not-allowed;" />
+            <p class="form-text">🏦 Demo mode — configure Stripe Connect for real payouts</p>
+          </div>
+
+          <!-- Withdrawal preview -->
+          <div id="withdraw-preview" class="hidden" style="background:rgba(99,102,241,0.07);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:20px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+              <span class="text-muted text-sm">Withdrawal amount</span>
+              <span id="preview-amount" style="font-weight:600;">—</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+              <span class="text-muted text-sm">Processing fee</span>
+              <span style="color:var(--success);font-weight:600;">FREE</span>
+            </div>
+            <div style="border-top:1px solid var(--border);padding-top:8px;display:flex;justify-content:space-between;">
+              <span style="font-weight:600;">You receive</span>
+              <span id="preview-receive" style="font-weight:700;color:var(--primary-light);">—</span>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-full btn-lg" id="submit-btn">
+            <span id="btn-text">💸 Request Withdrawal</span>
+            <span id="btn-spinner" class="spinner hidden"></span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Info panel -->
+      <div style="display:flex;flex-direction:column;gap:16px;">
+
+        <div class="wallet-card">
+          <div class="balance-label">Wallet Balance</div>
+          <div class="balance-amount" id="balance-amount">—</div>
+          <div class="balance-row">
+            <div class="balance-item">
+              <div class="balance-item-label">Available</div>
+              <div class="balance-item-value" id="available-balance">—</div>
+            </div>
+            <div class="balance-item">
+              <div class="balance-item-label">Locked</div>
+              <div class="balance-item-value" id="locked-balance">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-bottom:16px;">Withdrawal Policy</h3>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <span style="color:var(--success);font-size:1.1rem;flex-shrink:0;">✓</span>
+              <div>
+                <div style="font-weight:600;font-size:0.9rem;">No withdrawal fees</div>
+                <div class="text-muted text-sm">We never charge you to access your money</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <span style="color:var(--warning);font-size:1.1rem;flex-shrink:0;">⏱</span>
+              <div>
+                <div style="font-weight:600;font-size:0.9rem;">Processing time</div>
+                <div class="text-muted text-sm">Standard: instant · High-volume periods: up to 24h</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <span style="color:var(--primary-light);font-size:1.1rem;flex-shrink:0;">🔒</span>
+              <div>
+                <div style="font-weight:600;font-size:0.9rem;">Liquidity protection</div>
+                <div class="text-muted text-sm">During high withdrawal periods, requests may be queued to protect all users.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status legend -->
+        <div class="card card-sm">
+          <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;color:var(--text-muted);">Status Guide</div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div style="display:flex;align-items:center;gap:8px;font-size:0.82rem;">
+              <span class="badge badge-success">Completed</span> <span class="text-muted">Funds sent to your bank</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:0.82rem;">
+              <span class="badge badge-warning">Queued</span> <span class="text-muted">Processing within 24h</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:0.82rem;">
+              <span class="badge badge-primary">Pending</span> <span class="text-muted">Being processed now</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Withdrawal history -->
+    <div class="card mt-6">
+      <h3 style="margin-bottom:16px;">Withdrawal History</h3>
+      <div id="withdrawal-history">
+        <div style="text-align:center;padding:30px;"><span class="spinner" style="width:24px;height:24px;border-width:3px;"></span></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast-container"></div>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/wallet.js"></script>
+<script>
+  let availableBalance = 0;
+
+  function setAmount(val) {
+    document.getElementById('amount').value = val;
+    updatePreview(val);
+  }
+
+  function setAmountMax() {
+    document.getElementById('amount').value = availableBalance.toFixed(2);
+    updatePreview(availableBalance);
+  }
+
+  function updatePreview(val) {
+    const amt = parseFloat(val);
+    if (!amt || amt <= 0) {
+      document.getElementById('withdraw-preview').classList.add('hidden');
+      return;
+    }
+    document.getElementById('withdraw-preview').classList.remove('hidden');
+    document.getElementById('preview-amount').textContent  = '$' + amt.toFixed(2);
+    document.getElementById('preview-receive').textContent = '$' + amt.toFixed(2);
+  }
+
+  document.getElementById('amount').addEventListener('input', (e) => {
+    updatePreview(e.target.value);
+  });
+</script>
+</body>
+</html>

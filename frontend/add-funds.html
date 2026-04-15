@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Funds — FlyWallet</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈</text></svg>" />
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="navbar-brand">
+    <div class="logo-icon">✈</div>
+    FlyWallet
+  </a>
+  <div class="navbar-nav">
+    <a href="dashboard.html" class="nav-link">← Dashboard</a>
+    <button onclick="logout()" class="btn btn-ghost btn-sm">Logout</button>
+  </div>
+</nav>
+
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-section">Main</div>
+    <nav class="sidebar-menu">
+      <a href="dashboard.html" class="sidebar-link"><span class="icon">📊</span> Dashboard</a>
+      <a href="add-funds.html" class="sidebar-link active"><span class="icon">💳</span> Add Funds</a>
+      <a href="withdraw.html"  class="sidebar-link"><span class="icon">💸</span> Withdraw</a>
+      <a href="flights.html"   class="sidebar-link"><span class="icon">✈️</span> Book Flights</a>
+    </nav>
+    <div class="sidebar-section" style="margin-top:16px;">Account</div>
+    <nav class="sidebar-menu">
+      <button onclick="logout()" class="sidebar-link" style="border:none;background:none;cursor:pointer;width:100%;text-align:left;color:var(--danger);">
+        <span class="icon">🚪</span> Logout
+      </button>
+    </nav>
+    <div style="margin-top:auto;padding-top:24px;">
+      <div style="background:rgba(99,102,241,0.1);border:1px solid var(--border);border-radius:12px;padding:14px;">
+        <div style="font-size:0.72rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Current Balance</div>
+        <div id="sidebar-balance" style="font-size:1.4rem;font-weight:800;color:#fff;">—</div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="page-content">
+    <div class="disclaimer-banner">
+      ⚠️ <span>Deposits are processed via Stripe. Funds are credited to your travel wallet instantly.</span>
+    </div>
+
+    <div class="page-header">
+      <h2>💳 Add Funds</h2>
+      <p>Deposit money into your FlyWallet travel wallet</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;">
+
+      <!-- Deposit form -->
+      <div class="card">
+        <h3 style="margin-bottom:20px;">Deposit Amount</h3>
+        <div id="alert-box"></div>
+
+        <form id="deposit-form">
+          <div class="form-group">
+            <label class="form-label">Amount (USD)</label>
+            <input type="number" id="amount" class="form-control" placeholder="0.00"
+                   min="10" max="50000" step="0.01" required />
+            <div class="amount-presets">
+              <button type="button" class="preset-btn" onclick="setAmount(50)">$50</button>
+              <button type="button" class="preset-btn" onclick="setAmount(100)">$100</button>
+              <button type="button" class="preset-btn" onclick="setAmount(250)">$250</button>
+              <button type="button" class="preset-btn" onclick="setAmount(500)">$500</button>
+              <button type="button" class="preset-btn" onclick="setAmount(1000)">$1,000</button>
+            </div>
+            <p class="form-text">Minimum $10 · Maximum $50,000 per deposit</p>
+          </div>
+
+          <!-- Mock card fields (Stripe Elements would go here in production) -->
+          <div class="form-group">
+            <label class="form-label">Card Number</label>
+            <input type="text" class="form-control" value="4242 4242 4242 4242" readonly
+                   style="color:var(--text-dim);cursor:not-allowed;" />
+            <p class="form-text">🔒 Demo mode — using Stripe test card</p>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group">
+              <label class="form-label">Expiry</label>
+              <input type="text" class="form-control" value="12/26" readonly
+                     style="color:var(--text-dim);cursor:not-allowed;" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">CVC</label>
+              <input type="text" class="form-control" value="123" readonly
+                     style="color:var(--text-dim);cursor:not-allowed;" />
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-success w-full btn-lg" id="submit-btn">
+            <span id="btn-text">💳 Deposit Funds</span>
+            <span id="btn-spinner" class="spinner hidden"></span>
+          </button>
+        </form>
+
+        <div style="display:flex;align-items:center;gap:8px;margin-top:16px;justify-content:center;">
+          <span style="font-size:0.75rem;color:var(--text-dim);">🔒 Secured by</span>
+          <span style="font-size:0.85rem;font-weight:700;color:#635bff;">Stripe</span>
+        </div>
+      </div>
+
+      <!-- Info panel -->
+      <div style="display:flex;flex-direction:column;gap:16px;">
+
+        <!-- Current balance -->
+        <div class="wallet-card">
+          <div class="balance-label">Current Balance</div>
+          <div class="balance-amount" id="balance-amount">—</div>
+          <div class="balance-row">
+            <div class="balance-item">
+              <div class="balance-item-label">Available</div>
+              <div class="balance-item-value" id="available-balance">—</div>
+            </div>
+            <div class="balance-item">
+              <div class="balance-item-label">Travel Savings</div>
+              <div class="balance-item-value" style="color:#10b981;" id="bonus-earned">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- How it works -->
+        <div class="card">
+          <h3 style="margin-bottom:16px;">How deposits work</h3>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;gap:12px;align-items:flex-start;">
+              <div style="width:28px;height:28px;background:rgba(16,185,129,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
+              <div>
+                <div style="font-weight:600;font-size:0.9rem;">Enter amount</div>
+                <div class="text-muted text-sm">Choose how much to add to your wallet</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;">
+              <div style="width:28px;height:28px;background:rgba(99,102,241,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
+              <div>
+                <div style="font-weight:600;font-size:0.9rem;">Secure payment</div>
+                <div class="text-muted text-sm">Stripe processes your card payment securely</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;">
+              <div style="width:28px;height:28px;background:rgba(245,158,11,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
+              <div>
+                <div style="font-weight:600;font-size:0.9rem;">Instant credit</div>
+                <div class="text-muted text-sm">Balance appears in your wallet immediately</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer-banner" style="margin-bottom:0;">
+          ⚠️ <span style="font-size:0.78rem;">Travel savings bonuses are variable and not guaranteed. FlyWallet is not an investment platform.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent deposits -->
+    <div class="card mt-6">
+      <h3 style="margin-bottom:16px;">Recent Deposits</h3>
+      <div id="deposit-history">
+        <div style="text-align:center;padding:30px;"><span class="spinner" style="width:24px;height:24px;border-width:3px;"></span></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast-container"></div>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/wallet.js"></script>
+<script>
+  function setAmount(val) {
+    document.getElementById('amount').value = val;
+  }
+</script>
+</body>
+</html>

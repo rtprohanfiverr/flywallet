@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FlyWallet — Smart Travel Wallet</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈</text></svg>" />
+</head>
+<body>
+
+<!-- ── Navbar ─────────────────────────────────────────────────────────────── -->
+<nav class="navbar">
+  <a href="index.html" class="navbar-brand">
+    <div class="logo-icon">✈</div>
+    FlyWallet
+  </a>
+  <div class="navbar-nav">
+    <a href="index.html"      class="nav-link active"><span>Home</span></a>
+    <a href="flights.html"    class="nav-link"><span>Flights</span></a>
+    <a href="dashboard.html"  class="nav-link"><span>Dashboard</span></a>
+    <a href="login.html"      class="btn btn-secondary btn-sm" id="nav-login">Login</a>
+    <a href="signup.html"     class="btn btn-primary btn-sm"   id="nav-signup">Get Started</a>
+    <a href="dashboard.html"  class="btn btn-primary btn-sm hidden" id="nav-dashboard">Dashboard</a>
+  </div>
+</nav>
+
+<!-- ── Hero ───────────────────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-badge">✨ Smart Travel Savings — No Fees</div>
+  <h1>Save More on Every<br /><span>Flight You Book</span></h1>
+  <p class="hero-sub">
+    FlyWallet is your travel wallet that helps you manage flight bookings,
+    earn travel savings credits, and never overpay again.
+  </p>
+  <div class="hero-actions">
+    <a href="signup.html" class="btn btn-primary btn-lg">🚀 Create Free Wallet</a>
+    <a href="flights.html" class="btn btn-ghost btn-lg">✈ Browse Flights</a>
+  </div>
+
+  <!-- Floating wallet preview -->
+  <div style="margin-top:56px; display:flex; justify-content:center;">
+    <div class="wallet-card" style="max-width:360px; width:100%; text-align:left;">
+      <div class="balance-label">Wallet Balance</div>
+      <div class="balance-amount">$1,850.00</div>
+      <div class="balance-row">
+        <div class="balance-item">
+          <div class="balance-item-label">Travel Savings</div>
+          <div class="balance-item-value" style="color:#10b981;">+$18.50</div>
+        </div>
+        <div class="balance-item">
+          <div class="balance-item-label">Flights Booked</div>
+          <div class="balance-item-value">4</div>
+        </div>
+        <div class="balance-item">
+          <div class="balance-item-label">Status</div>
+          <div class="balance-item-value" style="color:#f59e0b;">✈ Active</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Stats bar ───────────────────────────────────────────────────────────── -->
+<div style="background:var(--bg-card); border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:28px 24px;">
+  <div class="container">
+    <div class="grid grid-4 gap-6" style="text-align:center;">
+      <div>
+        <div style="font-size:2rem; font-weight:800; color:var(--primary-light);">12,400+</div>
+        <div class="text-muted text-sm">Active Wallets</div>
+      </div>
+      <div>
+        <div style="font-size:2rem; font-weight:800; color:#10b981;">$4.2M</div>
+        <div class="text-muted text-sm">Flights Booked</div>
+      </div>
+      <div>
+        <div style="font-size:2rem; font-weight:800; color:#f59e0b;">840+</div>
+        <div class="text-muted text-sm">Routes Available</div>
+      </div>
+      <div>
+        <div style="font-size:2rem; font-weight:800; color:var(--secondary);">4.9★</div>
+        <div class="text-muted text-sm">User Rating</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Features ───────────────────────────────────────────────────────────── -->
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">Everything in one wallet</h2>
+    <p class="section-sub">Deposit, book flights, earn travel savings — all in one place.</p>
+
+    <div class="grid grid-3 gap-6">
+      <div class="card">
+        <div class="feature-icon" style="background:rgba(99,102,241,0.15);">💳</div>
+        <h3>Smart Wallet</h3>
+        <p class="text-muted mt-4" style="font-size:0.9rem;">Deposit funds securely via Stripe and manage your travel budget with real-time balance tracking.</p>
+      </div>
+      <div class="card">
+        <div class="feature-icon" style="background:rgba(16,185,129,0.15);">✈️</div>
+        <h3>Book Flights</h3>
+        <p class="text-muted mt-4" style="font-size:0.9rem;">Search hundreds of routes and book instantly using your wallet balance. No hidden fees.</p>
+      </div>
+      <div class="card">
+        <div class="feature-icon" style="background:rgba(245,158,11,0.15);">🎁</div>
+        <h3>Travel Savings Bonus</h3>
+        <p class="text-muted mt-4" style="font-size:0.9rem;">Earn daily travel savings credits on your wallet balance. Bonuses vary and are not guaranteed.</p>
+      </div>
+      <div class="card">
+        <div class="feature-icon" style="background:rgba(14,165,233,0.15);">🔒</div>
+        <h3>Secure & Fast</h3>
+        <p class="text-muted mt-4" style="font-size:0.9rem;">Bank-grade security with JWT auth, bcrypt passwords, and Stripe-powered payments.</p>
+      </div>
+      <div class="card">
+        <div class="feature-icon" style="background:rgba(239,68,68,0.15);">⚡</div>
+        <h3>Instant Deposits</h3>
+        <p class="text-muted mt-4" style="font-size:0.9rem;">Add funds to your wallet instantly via credit card or bank transfer through Stripe.</p>
+      </div>
+      <div class="card">
+        <div class="feature-icon" style="background:rgba(168,85,247,0.15);">📊</div>
+        <h3>Transaction History</h3>
+        <p class="text-muted mt-4" style="font-size:0.9rem;">Full ledger of every deposit, withdrawal, booking, and bonus credit. Total transparency.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── How it works ────────────────────────────────────────────────────────── -->
+<section class="section" style="background:var(--bg-card); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+  <div class="container">
+    <h2 class="section-title">How FlyWallet works</h2>
+    <p class="section-sub">Three simple steps to smarter travel</p>
+    <div class="grid grid-3 gap-8" style="text-align:center;">
+      <div>
+        <div style="width:64px;height:64px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 16px;">1</div>
+        <h3>Create your wallet</h3>
+        <p class="text-muted mt-4" style="font-size:0.9rem;">Sign up in 30 seconds. Your travel wallet is created automatically — no credit checks.</p>
+      </div>
+      <div>
+        <div style="width:64px;height:64px;background:linear-gradient(135deg,#059669,#10b981);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 16px;">2</div>
+        <h3>Add funds</h3>
+        <p class="text-muted mt-4" style="font-size:0.9rem;">Deposit money securely via Stripe. Funds appear in your wallet instantly.</p>
+      </div>
+      <div>
+        <div style="width:64px;height:64px;background:linear-gradient(135deg,#d97706,#f59e0b);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 16px;">3</div>
+        <h3>Book & save</h3>
+        <p class="text-muted mt-4" style="font-size:0.9rem;">Search flights and book using your balance. Earn daily travel savings credits automatically.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Disclaimer ──────────────────────────────────────────────────────────── -->
+<section style="padding:40px 24px;">
+  <div class="container">
+    <div class="disclaimer-banner">
+      ⚠️
+      <span><strong>Important:</strong> FlyWallet provides travel savings benefits. Bonus credits are variable and not guaranteed. FlyWallet is a travel wallet platform, not an investment product. Funds can be withdrawn at any time subject to liquidity.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ─────────────────────────────────────────────────────────────────── -->
+<section class="section" style="text-align:center;">
+  <div class="container">
+    <h2>Ready to fly smarter?</h2>
+    <p class="text-muted mt-4" style="margin-bottom:28px;">Join thousands of travelers saving on every flight.</p>
+    <a href="signup.html" class="btn btn-primary btn-lg">Create Free Wallet →</a>
+  </div>
+</section>
+
+<!-- ── Footer ──────────────────────────────────────────────────────────────── -->
+<footer style="background:var(--bg-card); border-top:1px solid var(--border); padding:32px 24px; text-align:center;">
+  <div class="container">
+    <div class="navbar-brand" style="justify-content:center; margin-bottom:16px;">
+      <div class="logo-icon">✈</div>
+      FlyWallet
+    </div>
+    <p class="text-muted text-sm">© 2024 FlyWallet. All rights reserved. Not an investment platform.</p>
+    <p class="text-dim text-xs mt-4">Travel savings bonuses are variable, not guaranteed, and may be zero at any time.</p>
+  </div>
+</footer>
+
+<div id="toast-container"></div>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  // Update nav based on auth state
+  document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('fw_token');
+    if (token) {
+      document.getElementById('nav-login').classList.add('hidden');
+      document.getElementById('nav-signup').classList.add('hidden');
+      document.getElementById('nav-dashboard').classList.remove('hidden');
+    }
+  });
+</script>
+</body>
+</html>
